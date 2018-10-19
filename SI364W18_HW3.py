@@ -19,7 +19,7 @@ app.config['SECRET_KEY'] = 'hard to guess string from si364'
 ## TODO 364: Create a database in postgresql in the code line below, and fill in your app's database URI. It should be of the format: postgresql://localhost/YOUR_DATABASE_NAME
 
 ## Your final Postgres database should be your uniqname, plus HW3, e.g. "jczettaHW3" or "maupandeHW3"
-app.config["SQLALCHEMY_DATABASE_URI"] = ""
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:ROCKCITY123/localhost/krguHW3"
 ## Provided:
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -45,6 +45,22 @@ db = SQLAlchemy(app) # For database use
 
 ## The following relationships should exist between them:
 # Tweet:User - Many:One
+class Tweet(db.Model):
+    __tablename__ = 'tweets'
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(280))
+    user_id = db.Colum(db.Integer,db.ForeignKey('user.id'))
+    def __repr__(self):
+         return '{} (ID: {})'.format(self.text, self.id)
+
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64))
+    display_name = db.Column(db.String(124))
+    tweets = db.relationship('Tweet',backref='user')
+    def __repr__(self):
+         return '{} | ID: {}'.format(self.username, self.id)
 
 # - Tweet
 ## -- id (Integer, Primary Key)
@@ -76,6 +92,19 @@ db = SQLAlchemy(app) # For database use
 ## -- display_name: the display name of the twitter user with that username (Required, + set up custom validation for this -- see below)
 
 # HINT: Check out index.html where the form will be rendered to decide what field names to use in the form class definition
+class TweetForm(FlaskForm):
+    text = StringField('Enter the tweet text (280 chars max): ', validators=[Required(), Length(1,280)])
+    username = StringField('Enter the name of the Twitter user (no "@"!): ', validators=[Required(),Length(1,64)])
+    display_name = StringField('Enter the display name of the Twitter user (must be at least 2 words): ', validators=[Required(),])
+
+    def validate_username(self, field):
+        if field.data[0] == '@':
+            raise ValidationError('ERROR: Username begins with "@" -- leave "@" off in form submission!')
+
+    def validate_display_name(self, field):
+        if len(field.data.split()) < 2:
+            raise ValidationError('ERROR: Display name is not at least 2 words.')
+
 
 # TODO 364: Set up custom validation for this form such that:
 # - the twitter username may NOT start with an "@" symbol (the template will put that in where it should appear)
@@ -118,11 +147,12 @@ def internal_server_error(e):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     # Initialize the form
-
+    tweet = TweetForm()
     # Get the number of Tweets
 
     # If the form was posted to this route,
     ## Get the data from the form
+    if tweet.validate_on_submit():
 
     ## Find out if there's already a user with the entered username
     ## If there is, save it in a variable: user
