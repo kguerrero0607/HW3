@@ -163,7 +163,7 @@ def index():
     ## Or if there is not, then create one and add it to the database
         user = User.query.filter_by(username=username).first()
         if not user:
-            user = User(username=username)
+            user = User(username=username,display_name=display_name)
             db.session.add(user)
             db.session.commit()
 
@@ -182,6 +182,7 @@ def index():
     ## Redirect to the index page
         if not specific_tweet:
             specific_tweet = Tweet(text=text,user_id=user.id)
+            flash('Tweet successfully added')
             db.session.add(specific_tweet)
             db.session.commit()
 
