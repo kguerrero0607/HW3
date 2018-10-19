@@ -96,6 +96,7 @@ class TweetForm(FlaskForm):
     text = StringField('Enter the tweet text (280 chars max): ', validators=[Required(), Length(1,280)])
     username = StringField('Enter the name of the Twitter user (no "@"!): ', validators=[Required(),Length(1,64)])
     display_name = StringField('Enter the display name of the Twitter user (must be at least 2 words): ', validators=[Required(),])
+    submit = SubmitField('Submit')
 
     def validate_username(self, field):
         if field.data[0] == '@':
