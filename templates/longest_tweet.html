@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+The tweet text with the most non-whitespace characters is:<br><br>
+
+<i>{{ tweet_text }}</i> posted by <strong>{{ username }}</strong> ({{ display_name }})
+
+<div>
+    {% for message in get_flashed_messages() %}
+    <strong>*** {{ message }} ***</strong>
+    {% endfor %}
+</div>
+
+{% endblock %}
